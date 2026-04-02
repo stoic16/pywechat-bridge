@@ -33,7 +33,13 @@ from pywechat import WeChat
 └──────────────────┘         └─────────────┘
 ```
 
-## 快速开始
+### WSL + Windows 部署模型（推荐）
+
+- Windows 侧运行时：`main.py` + `start.bat`（依赖 pyweixin/pywechat）
+- WSL/OpenClaw 侧 Skill：仅调用 HTTP 接口，不直接导入 pyweixin/pywechat
+- 通过 `.env` 的 `WECHAT_BRIDGE_URL` 指向 Windows 运行端
+
+## 快速开始（手动部署）
 
 1. **克隆本项目**：
    ```powershell
@@ -42,23 +48,45 @@ from pywechat import WeChat
    cd pywechat-bridge
    ```
 
-2. **安装依赖**（管理员 PowerShell）：
+2. **创建并激活虚拟环境**（Python 3.9+）：
    ```powershell
-   .\install.ps1
+   python -m venv .venv
+   .\.venv\Scripts\activate
    ```
 
-3. **启动 Bridge**：
+3. **安装本项目依赖**：
    ```powershell
+   pip install -r requirements.txt
+   ```
+
+4. **手动安装 PyWeChat/PyWeixin**（在当前虚拟环境中）：
+   ```powershell
+   cd C:\Users\你的用户名\Documents
+   git clone https://github.com/Hello-Mr-Crab/pywechat.git
+   cd pywechat
+   pip install -e .
+   ```
+
+5. **验证依赖可导入**：
+   ```powershell
+   python -c "from pyweixin import WeChat; print('pyweixin OK')"
+   # 若失败可尝试旧版兼容
+   python -c "from pywechat import WeChat; print('pywechat OK')"
+   ```
+
+6. **返回项目目录并启动 Bridge**：
+   ```powershell
+   cd C:\Users\你的用户名\Documents\pywechat-bridge
    .\start.bat
    # 或 .\start.bat start
    ```
 
-4. **测试服务**：
+7. **测试服务**：
    ```powershell
    .\test.ps1
    ```
 
-5. **停止服务**：
+8. **停止服务**：
    ```powershell
    .\start.bat stop
    ```
@@ -67,12 +95,21 @@ from pywechat import WeChat
 
 | 文件 | 用途 |
 |------|------|
+| `main.py` | Windows 运行入口（调用 Bridge 服务） |
 | `pywechat_bridge_simple.py` | Bridge 服务（纯 Python，无需 fastapi） |
 | `requirements.txt` | Python 依赖 |
-| `install.ps1` | Windows 安装脚本 |
 | `start.bat` | Windows 启动/停止/重启服务 |
+| `skill.md` | OpenClaw Skill 说明与最小 API 映射 |
+| `.env` | Skill 侧桥接地址配置（`WECHAT_BRIDGE_URL`） |
 | `test.ps1` | Windows 测试脚本 |
 | `README.md` | 项目文档 |
+
+## Skill 最小 API 映射
+
+1. `health_check` -> `GET /`
+2. `send_text` -> `POST /send`
+3. `list_contacts` -> `GET /contacts`
+4. `list_groups` -> `GET /groups`
 
 ## API 接口
 

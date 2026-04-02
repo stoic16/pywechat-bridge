@@ -27,7 +27,7 @@ if exist "%PIDFILE%" (
 )
 
 REM 启动服务
-start /b python "pywechat_bridge_simple.py" --init >"%TEMP%\pywechat-bridge.log" 2>&1
+start /b python "main.py" --init >"%TEMP%\pywechat-bridge.log" 2>&1
 
 REM 等待服务启动
 timeout /t 2 /nobreak >nul
@@ -57,10 +57,10 @@ if exist "%PIDFILE%" (
     )
     del "%PIDFILE%" 2>nul
 ) else (
-    REM 尝试查找并终止 pywechat_bridge_simple.py
-    taskkill /FI "WINDOWTITLE eq pywechat_bridge_simple.py" /F 2>nul
+    REM 尝试查找并终止 main.py
+    taskkill /FI "WINDOWTITLE eq main.py" /F 2>nul
     for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq python.exe" ^| findstr python') do (
-        wmic process where "ProcessId=%%a" get CommandLine 2>nul | find "pywechat_bridge_simple" >nul
+        wmic process where "ProcessId=%%a" get CommandLine 2>nul | find "main.py" >nul
         if !ERRORLEVEL! equ 0 taskkill /PID %%a /F 2>nul
     )
     echo 已尝试停止相关进程
